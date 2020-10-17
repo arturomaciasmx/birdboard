@@ -16,8 +16,12 @@ use Illuminate\Support\Facades\Route;
 
 Route::get('/projects', [ProjectsController::class, 'index']);
 Route::get('/projects/{project}', [ProjectsController::class, 'show']);
-Route::post('/projects', [ProjectsController::class, 'store']);
+Route::post('/projects', [ProjectsController::class, 'store'])->middleware('auth');
 
 Route::get('/', function () {
     return view('welcome');
 });
+
+Route::middleware(['auth:sanctum', 'verified'])->get('/dashboard', function () {
+    return view('dashboard');
+})->name('dashboard');
