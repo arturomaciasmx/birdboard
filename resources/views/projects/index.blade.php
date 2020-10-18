@@ -1,22 +1,24 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta http-equiv="X-UA-Compatible" content="ie=edge">
-    <title>Document</title>
-</head>
-<body>
-    <h1>birdboard</h1>
-    <ul>
-        @forelse ($projects as $project)
-            <li>
-                <a href="{{ $project->path() }}">
-                    {{ $project->title }}</li>
-                </a>
-        @empty
-            <li>No projects jet</li>
-        @endforelse
-    </ul>
-</body>
-</html>
+<x-app-layout>
+    <x-slot name="header">
+        <div class="flex justify-between">
+            <h2 class="font-semibold text-xl text-gray-800 leading-tight">
+                {{ 'Projects' }}
+            </h2>
+            <a href="/projects/create" class="text-blue-500 hover:text-blue-800 font-bold">Nuevo Projecto</a>
+        </div>
+    </x-slot>
+
+    <div class="container mx-auto py-8">
+        <ul>
+            @forelse ($projects as $project)
+                <li>
+                    <a href="{{ $project->path() }}" class="hover:text-blue-500">
+                        {{ $project->title }}</li>
+                    </a>
+            @empty
+                <li>No projects jet</li>
+            @endforelse
+        </ul>
+    </div>
+
+</x-app-layout>
