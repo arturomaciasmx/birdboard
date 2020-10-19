@@ -6,7 +6,13 @@ h3 {
     @apply text-xl font-bold text-gray-800;
 }
 
-
+/* card */
+.card {
+    @apply rounded-lg shadow-lg bg-white p-4;
+}
+.card-project {
+    @apply card h-48;
+}
 /* buttons */
 .btn {
     @apply font-bold py-2 px-4 shadow rounded-lg;
