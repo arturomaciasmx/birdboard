@@ -6,7 +6,7 @@
                     My projects
                 </a> / {{ $project->title }}
             </p>
-            <a href="#" class=" btn btn-blue">New Project</a>
+            <a href="#" class=" btn btn-blue">Add Task</a>
         </div>
     </x-slot>
 
@@ -16,9 +16,15 @@
                 <div class="w-full lg:w-2/3 md:w-2/4 px-4">
                     <div class="pb-8">
                         <h2 class="text-gray-400 text-2xl mb-2">Tasks</h2>
-                        <div class="card">
-                            Lorem ipsum dolor sit amet consectetur
-                        </div>
+                        @forelse ($project->tasks as $task)
+
+                            <div class="card mb-4">{{ $task->body }}</div>
+
+                        @empty
+
+                            <p class=" text-gray-400">No tasks yet</p>
+
+                        @endforelse
                     </div>
                     <div>
                         <h2 class=" text-gray-400 text-2xl mb-2">General Notes</h2>

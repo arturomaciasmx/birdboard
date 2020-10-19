@@ -54,4 +54,20 @@ class ProjectTest extends TestCase
 
         $this->post('/projects', $attributes)->assertRedirect('login');
     }
+
+    /** @test */
+    public function a_project_can_add_tasks()
+    {
+        $this->withoutExceptionHandling();
+
+        $this->actingAs(User::factory()->create());
+
+        $project = Project::factory()->create(['owner_id' => auth()->id()]);
+
+        $task = $project->addTask('test task');
+
+        $this->assertCount(1, $project->tasks);
+
+        $this->assertTrue($project->tasks->contains($task));
+    }
 }
