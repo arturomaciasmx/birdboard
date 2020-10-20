@@ -8,10 +8,15 @@ use Illuminate\Http\Request;
 class TaskController extends Controller
 {
     public function store(Project $project) {
-        // dd(request('body'));
 
-        $atributes = request()->validate(['body' => 'required']);
+        if(auth()->user()->isNot($project->owner)){
+            abort(403);
+        }
+
+        request()->validate(['body' => 'required']);
 
         $project->addTask(request('body'));
+
+        return redirect($project->path());
     }
 }

@@ -25,6 +25,14 @@
                             <p class=" text-gray-400">No tasks yet</p>
 
                         @endforelse
+
+                        <div class="card">
+                            <form action="{{ $project->path() . '/tasks' }}" method="POST">
+                                @csrf
+                                <input type="text" name="body" class="w-full" placeholder="Add new task...">
+                            </form>
+                        </div>
+
                     </div>
                     <div>
                         <h2 class=" text-gray-400 text-2xl mb-2">General Notes</h2>
