@@ -45,7 +45,12 @@
                     </div>
                     <div>
                         <h2 class=" text-gray-400 text-2xl mb-2">General Notes</h2>
-                        <textarea class="card w-full h-48">Lorem ipsum dolor sit amet consectetur adipisicing elit. Quis provident, dolores laborum facere quidem corrupti! Cupiditate sapiente aliquam expedita. Corrupti temporibus inventore illo est, repudiandae atque nesciunt ab tempore consequuntur?</textarea>
+                        <form action="{{ $project->path() }}" method="POST">
+                            @csrf
+                            @method('PATCH')
+                            <textarea class="card w-full h-48" name="notes">{{ $project->notes }}</textarea>
+                            <input type="submit" value="Save" class="btn btn-blue">
+                        </form>
                     </div>
                 </div>
                 <div class="w-full lg:w-1/3 md:w-2/4 px-4">

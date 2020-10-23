@@ -43,6 +43,21 @@ class ManageProjectTest extends TestCase
     }
 
     /** @test */
+    public function a_user_can_update_a_project() {
+
+        $this->withoutExceptionHandling();
+
+        $this->actingAs(User::factory()->create());
+
+        $project = Project::factory()->create(['owner_id' => auth()->id()]);
+
+        $this->patch($project->path(), ['notes' => 'updated']);
+
+        $this->assertDatabaseHas('projects', ['notes' => 'updated']);
+
+    }
+
+    /** @test */
     public function a_user_can_view_their_project()
     {
         $this->withoutExceptionHandling();
@@ -62,6 +77,16 @@ class ManageProjectTest extends TestCase
         $project = Project::factory()->create();
 
         $this->get($project->path())->assertStatus(403);
+    }
+
+    /** @test */
+    public function a_user_cannot_update_projects_of_others()
+    {
+        $this->actingAs(User::factory()->create());
+
+        $project = Project::factory()->create();
+
+        $this->patch($project->path(), ['notes' => 'test update'])->assertStatus(403);
     }
 
 }
