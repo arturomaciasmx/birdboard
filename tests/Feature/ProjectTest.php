@@ -4,8 +4,10 @@ namespace Tests\Feature;
 
 use App\Models\Project;
 use App\Models\User;
+use Database\Factories\ProjectFactory;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Foundation\Testing\WithFaker;
+use Tests\Setup\ProjectFactory as SetupProjectFactory;
 use Tests\TestCase;
 
 class ProjectTest extends TestCase
@@ -56,18 +58,12 @@ class ProjectTest extends TestCase
     }
 
     /** @test */
-    public function a_project_can_add_tasks()
+    public function a_project_can_have_tasks()
     {
-        $this->withoutExceptionHandling();
 
-        $this->actingAs(User::factory()->create());
-
-        $project = Project::factory()->create(['owner_id' => auth()->id()]);
-
-        $task = $project->addTask('test task');
+        $project = app(SetupProjectFactory::class)->withTasks(1)->create();
 
         $this->assertCount(1, $project->tasks);
 
-        $this->assertTrue($project->tasks->contains($task));
     }
 }

@@ -7,6 +7,7 @@ use App\Models\Task;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Foundation\Testing\WithFaker;
+use Tests\Setup\ProjectFactory;
 use Tests\TestCase;
 
 class ProjectTaskTest extends TestCase
@@ -16,13 +17,11 @@ class ProjectTaskTest extends TestCase
     /** @test */
     public function guest_cannot_add_tasks_to_projects()
     {
-        $project = Project::factory()->create();
+        $project = app(ProjectFactory::class)->withTasks(1)->create();
 
         $this->get($project->path() . '/tasks')->assertRedirect('/login');
 
-        $task = Task::factory()->raw();
-
-        $this->post($project->path() . '/tasks', $task)->assertRedirect('/login');
+        $this->post($project->path() . '/tasks')->assertRedirect('/login');
     }
 
     /** @test */
@@ -42,13 +41,11 @@ class ProjectTaskTest extends TestCase
     /** @test */
     public function only_the_owner_of_the_project_can_update_a_task()
     {
+        $project = app(ProjectFactory::class)->withTasks(1)->create();
+
         $this->actingAs(User::factory()->create());
 
-        $project = Project::factory()->create();
-
-        $task = Task::factory()->create();
-
-        $this->patch($project->path() . '/tasks/' . $task->id, [
+        $this->patch($project->tasks->first()->path(), [
             'body' => 'updated',
             'completed' => true
         ])->assertStatus(403);
@@ -74,15 +71,11 @@ class ProjectTaskTest extends TestCase
     /** @test */
     public function a_task_can_be_updated()
     {
-        $this->withoutExceptionHandling();
+        $project = app(ProjectFactory::class)->withTasks(1)->create();
 
-        $this->actingAs(User::factory()->create());
+        $this->actingAs($project->owner);
 
-        $project = Project::factory()->create(['owner_id' => auth()->id()]);
-
-        $task = $project->addTask('test task');
-
-        $this->patch($project->path() . '/tasks/' . $task->id, [
+        $this->patch($project->tasks->first()->path(), [
             'body' => 'changed',
             'completed' => true
         ])->assertRedirect($project->path());
@@ -97,21 +90,20 @@ class ProjectTaskTest extends TestCase
     /** @test */
     public function a_task_require_a_body()
     {
-        $this->actingAs(User::factory()->create());
+
+        $project = app(ProjectFactory::class)->create();
 
         $attributes = Task::factory()->raw(['body' => '']);
 
-        $project = Project::factory()->create(['owner_id' => auth()->id()]);
-
-        $this->post($project->path() . '/tasks', $attributes)->assertSessionHasErrors('body');
+        $this->actingAs($project->owner)
+            ->post($project->path() . '/tasks', $attributes)
+            ->assertSessionHasErrors('body');
 
     }
 
     /** @test */
     public function a_task_has_path()
     {
-
-        $this->withoutExceptionHandling();
 
         $task = Task::factory()->create();
 

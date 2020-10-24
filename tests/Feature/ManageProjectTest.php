@@ -6,6 +6,7 @@ use App\Models\Project;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Foundation\Testing\WithFaker;
+use Tests\Setup\ProjectFactory;
 use Tests\TestCase;
 
 class ManageProjectTest extends TestCase
@@ -16,7 +17,6 @@ class ManageProjectTest extends TestCase
     /** @test */
     public function guest_cannot_manage_project()
     {
-        // $this->withoutExceptionHandling();
 
         $project = Project::factory()->create();
 
@@ -27,11 +27,11 @@ class ManageProjectTest extends TestCase
         $this->get($project->path())->assertRedirect('login');
 
         $this->post('/projects', $project->toArray())->assertRedirect('/login');
+
     }
 
     /** @test */
     public function a_user_can_crate_a_project() {
-        // $this->withoutExceptionHandling();
 
         $this->be(User::factory()->create());
 
@@ -45,34 +45,31 @@ class ManageProjectTest extends TestCase
     /** @test */
     public function a_user_can_update_a_project() {
 
-        $this->withoutExceptionHandling();
+        $project = Project::factory()->create();
 
-        $this->actingAs(User::factory()->create());
+        $this->actingAs($project->owner);
 
-        $project = Project::factory()->create(['owner_id' => auth()->id()]);
+        $this->patch($project->path(), $attributes = ['notes' => 'updated']);
 
-        $this->patch($project->path(), ['notes' => 'updated']);
-
-        $this->assertDatabaseHas('projects', ['notes' => 'updated']);
+        $this->assertDatabaseHas('projects', $attributes);
 
     }
 
     /** @test */
     public function a_user_can_view_their_project()
     {
-        $this->withoutExceptionHandling();
 
-        $this->be(User::factory()->create());
+        $project = app(ProjectFactory::class)->create();
 
-        $project = Project::factory()->create(['owner_id' => auth()->user()->id]);
+        $this->actingAs($project->owner)
+            ->get($project->path())->assertSee($project->title);
 
-        $this->get($project->path())->assertSee($project->title);
     }
 
     /** @test */
     public function a_user_cannot_view_projects_of_others()
     {
-        $this->be(User::factory()->create());
+        $this->actingAs(User::factory()->create());
 
         $project = Project::factory()->create();
 
