@@ -53,37 +53,57 @@ class ActivityTest extends TestCase
         $this->assertEquals('task_created', $project->activity->last()->description);
     }
 
-    /** @test */
-    public function updating_a_task_create_activity_on_project()
-    {
-        $project = app(ProjectFactory::class)->create();
+    // /** @test */
+    // public function updating_a_task_create_activity_on_project()
+    // {
+    //     $project = app(ProjectFactory::class)->create();
 
-        $task = $project->addTask('new task');
+    //     $task = $project->addTask('new task');
 
-        $this->actingAs($project->owner)
-            ->patch($task->path(), [
-                'body' => 'updated',
+    //     $this->actingAs($project->owner)
+    //         ->patch($task->path(), [
+    //             'body' => 'updated',
+    //         ]);
 
-            ]);
-
-        $this->assertCount(3, $project->activity);
-    }
+    //     dd($project->activity);
+    //     $this->assertCount(3, $project->activity);
+    // }
 
     /** @test */
     public function completing_a_task_create_activity_on_project()
     {
-        $project = app(ProjectFactory::class)->create();
-
-        $task = $project->addTask('new task');
+        $project = app(ProjectFactory::class)->withTasks(1)->create();
 
         $this->actingAs($project->owner)
-            ->patch($task->path(), [
+            ->patch($project->tasks[0]->path(), [
                 'body' => 'body',
                 'completed' => true
             ]);
 
-        $this->assertCount(4, $project->activity);
+        $this->assertCount(3, $project->activity);
 
         $this->assertEquals('task_completed', $project->activity->last()->description);
+    }
+
+    /** @test */
+    public function incompleting_a_task_create_activity_on_project()
+    {
+
+        $project = app(ProjectFactory::class)->withTasks(1)->create();
+
+        $this->actingAs($project->owner)
+            ->patch($project->tasks[0]->path(), [
+                'body' => 'body',
+                'completed' => true
+            ]);
+
+        $this->patch($project->tasks[0]->path(), [
+            'body' => 'body',
+            'completed' => false
+        ]);
+
+        $this->assertCount(4, $project->fresh()->activity);
+
+        $this->assertEquals('task_incompleted', $project->fresh()->activity->last()->description);
     }
 }

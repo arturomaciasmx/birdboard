@@ -26,7 +26,7 @@ class Project extends Model
     {
 
 
-        return $this->tasks()->create(['body' => $body]);
+        return $this->tasks()->create(['body' => $body, 'completed' => false]);
     }
 
 
@@ -41,13 +41,11 @@ class Project extends Model
     public function tasks()
     {
 
-
         return $this->hasMany(Task::class);
     }
 
     public function activity()
     {
-
 
         return $this->hasMany(Activity::class);
     }

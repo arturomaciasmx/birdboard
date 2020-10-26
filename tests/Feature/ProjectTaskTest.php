@@ -35,7 +35,6 @@ class ProjectTaskTest extends TestCase
         $task = Task::factory()->raw();
 
         $this->post($project->path() . '/tasks', $task)->assertStatus(403);
-
     }
 
     /** @test */
@@ -84,7 +83,6 @@ class ProjectTaskTest extends TestCase
             'body' => 'changed',
             'completed' => true
         ]);
-
     }
 
     /** @test */
@@ -98,7 +96,6 @@ class ProjectTaskTest extends TestCase
         $this->actingAs($project->owner)
             ->post($project->path() . '/tasks', $attributes)
             ->assertSessionHasErrors('body');
-
     }
 
     /** @test */
@@ -108,7 +105,35 @@ class ProjectTaskTest extends TestCase
         $task = Task::factory()->create();
 
         $this->assertEquals($task->project->path() . '/tasks/' . $task->id, $task->path());
-
     }
 
+    /** @test */
+    public function a_task_can_be_completed()
+    {
+        $project = app(ProjectFactory::class)->create();
+
+        $task = $project->addTask('new task');
+
+        $this->assertFalse($task->completed);
+
+        $task->complete();
+
+        $this->assertTrue($task->completed);
+    }
+
+    /** @test */
+    public function a_task_can_be_incompleted()
+    {
+        $project = app(ProjectFactory::class)->create();
+
+        $task = $project->addTask('new task');
+
+        $task->complete();
+
+        $this->assertTrue($task->completed);
+
+        $task->incomplete();
+
+        $this->assertFalse($task->completed);
+    }
 }

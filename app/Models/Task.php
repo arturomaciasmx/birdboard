@@ -22,15 +22,6 @@ class Task extends Model
         static::created(function ($task) {
             $task->project->recordActivity('task_created');
         });
-
-        static::updated(function ($task) {
-
-            $task->project->recordActivity('task_updated');
-
-            if ($task['completed']) {
-                $task->project->recordActivity('task_completed');
-            }
-        });
     }
 
 
@@ -42,5 +33,17 @@ class Task extends Model
     public function path()
     {
         return $this->project->path() . '/tasks/' . $this->id;
+    }
+
+    public function complete()
+    {
+        $this->update(['completed' => true]);
+        $this->project->recordActivity('task_completed');
+    }
+
+    public function incomplete()
+    {
+        $this->update(['completed' => false]);
+        $this->project->recordActivity('task_incompleted');
     }
 }
