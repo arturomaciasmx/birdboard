@@ -9,7 +9,5 @@ class Activity extends Model
 {
     use HasFactory;
 
-
     protected $guarded = [];
-
 }

@@ -24,12 +24,12 @@ class ActivityTest extends TestCase
         $this->assertCount(1, $project->activity);
 
         $this->assertEquals('created', $project->activity[0]->description);
-
     }
 
 
     /** @test */
-    public function updating_a_project_creates_activity() {
+    public function updating_a_project_creates_activity()
+    {
 
         $this->withoutExceptionHandling();
         $project = app(ProjectFactory::class)->create();
@@ -40,7 +40,50 @@ class ActivityTest extends TestCase
         $this->assertCount(2, $project->activity);
 
         $this->assertEquals('updated', $project->activity->last()->description);
-
     }
 
+    /** @test */
+    public function creating_a_task_create_activity_on_project()
+    {
+
+        $project = app(ProjectFactory::class)->withTasks(1)->create();
+
+        $this->assertCount(2, $project->activity);
+
+        $this->assertEquals('task_created', $project->activity->last()->description);
+    }
+
+    /** @test */
+    public function updating_a_task_create_activity_on_project()
+    {
+        $project = app(ProjectFactory::class)->create();
+
+        $task = $project->addTask('new task');
+
+        $this->actingAs($project->owner)
+            ->patch($task->path(), [
+                'body' => 'updated',
+
+            ]);
+
+        $this->assertCount(3, $project->activity);
+    }
+
+    /** @test */
+    public function completing_a_task_create_activity_on_project()
+    {
+        $project = app(ProjectFactory::class)->create();
+
+        $task = $project->addTask('new task');
+
+        $this->actingAs($project->owner)
+            ->patch($task->path(), [
+                'body' => 'body',
+                'completed' => true
+            ]);
+
+        $this->assertCount(4, $project->activity);
+
+        $this->assertEquals('task_completed', $project->activity->last()->description);
+    }
 }

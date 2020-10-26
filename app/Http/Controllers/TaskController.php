@@ -2,13 +2,15 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Activity;
 use App\Models\Project;
 use App\Models\Task;
 use Illuminate\Http\Request;
 
 class TaskController extends Controller
 {
-    public function store(Project $project) {
+    public function store(Project $project)
+    {
 
         $this->authorize('update', $project);
 
@@ -19,20 +21,20 @@ class TaskController extends Controller
         return redirect($project->path());
     }
 
-    public function update(Project $project, Task $task) {
+    public function update(Project $project, Task $task)
+    {
 
         $this->authorize('update', $project);
 
-        request()->validate([
-            'body' => 'required'
+        $request = request()->validate([
+            'body' => 'required',
+            'completed' => 'sometimes'
         ]);
 
-        $task->update([
-            'body' => request('body'),
-            'completed' => request()->has('completed')
-        ]);
+
+        $task->update($request);
+
 
         return redirect($project->path());
-
     }
 }

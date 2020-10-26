@@ -19,8 +19,6 @@ class Project extends Model
 
 
         return '/projects/' . $this->id;
-
-
     }
 
 
@@ -29,8 +27,6 @@ class Project extends Model
 
 
         return $this->tasks()->create(['body' => $body]);
-
-
     }
 
 
@@ -39,8 +35,6 @@ class Project extends Model
 
 
         return $this->belongsTo(User::class);
-
-
     }
 
 
@@ -49,8 +43,6 @@ class Project extends Model
 
 
         return $this->hasMany(Task::class);
-
-
     }
 
     public function activity()
@@ -58,7 +50,13 @@ class Project extends Model
 
 
         return $this->hasMany(Activity::class);
+    }
 
-
+    public function recordActivity($type)
+    {
+        Activity::create([
+            'project_id' => $this->id,
+            'description' => $type
+        ]);
     }
 }
