@@ -14,26 +14,6 @@ class Task extends Model
 
     protected $touches = ['project'];
 
-
-    public static function boot()
-    {
-        parent::boot();
-
-        static::created(function ($task) {
-            $task->project->recordActivity('task_created');
-        });
-
-        static::deleted(function ($task) {
-            $task->project->recordActivity('task_deleted');
-        });
-    }
-
-
-    public function project()
-    {
-        return $this->belongsTo(Project::class);
-    }
-
     public function path()
     {
         return $this->project->path() . '/tasks/' . $this->id;
@@ -42,12 +22,30 @@ class Task extends Model
     public function complete()
     {
         $this->update(['completed' => true]);
-        $this->project->recordActivity('task_completed');
+        $this->recordActivity('task_completed');
     }
 
     public function incomplete()
     {
         $this->update(['completed' => false]);
-        $this->project->recordActivity('task_incompleted');
+        $this->recordActivity('task_incompleted');
+    }
+
+    public function recordActivity($description)
+    {
+        $this->activity()->create([
+            'project_id' => $this->project->id,
+            'description' => $description
+        ]);
+    }
+
+    public function activity()
+    {
+        return $this->morphMany(Activity::class, 'subject')->latest();
+    }
+
+    public function project()
+    {
+        return $this->belongsTo(Project::class);
     }
 }

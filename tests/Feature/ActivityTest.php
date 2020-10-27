@@ -2,6 +2,8 @@
 
 namespace Tests\Feature;
 
+use App\Models\Project;
+use App\Models\Task;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Foundation\Testing\WithFaker;
 use Tests\Setup\ProjectFactory;
@@ -17,8 +19,6 @@ class ActivityTest extends TestCase
     /** @test */
     public function creating_a_project_creates_activity()
     {
-
-
         $project = app(ProjectFactory::class)->create();
 
         $this->assertCount(1, $project->activity);
@@ -45,29 +45,15 @@ class ActivityTest extends TestCase
     /** @test */
     public function creating_a_task_create_activity_on_project()
     {
+        $this->withoutExceptionHandling();
 
         $project = app(ProjectFactory::class)->withTasks(1)->create();
 
         $this->assertCount(2, $project->activity);
 
         $this->assertEquals('task_created', $project->activity->last()->description);
+        $this->assertInstanceOf(Task::class, $project->activity->last()->subject);
     }
-
-    // /** @test */
-    // public function updating_a_task_create_activity_on_project()
-    // {
-    //     $project = app(ProjectFactory::class)->create();
-
-    //     $task = $project->addTask('new task');
-
-    //     $this->actingAs($project->owner)
-    //         ->patch($task->path(), [
-    //             'body' => 'updated',
-    //         ]);
-
-    //     dd($project->activity);
-    //     $this->assertCount(3, $project->activity);
-    // }
 
     /** @test */
     public function completing_a_task_create_activity_on_project()
@@ -83,6 +69,8 @@ class ActivityTest extends TestCase
         $this->assertCount(3, $project->activity);
 
         $this->assertEquals('task_completed', $project->activity->last()->description);
+
+        $this->assertInstanceOf(Task::class, $project->activity->last()->subject);
     }
 
     /** @test */
@@ -105,6 +93,7 @@ class ActivityTest extends TestCase
         $this->assertCount(4, $project->fresh()->activity);
 
         $this->assertEquals('task_incompleted', $project->fresh()->activity->last()->description);
+        $this->assertInstanceOf(Task::class, $project->activity->last()->subject);
     }
 
     /** @test */

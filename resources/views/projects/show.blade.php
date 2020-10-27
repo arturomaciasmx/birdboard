@@ -60,7 +60,7 @@
                             @foreach ($project->activity as $activity)
                             <li>
                                 @include('projects.activity.' . $activity->description)
-                                <span class="text-gray-400">{{ $activity->created_at->diffForHumans() }}</span>
+                                <span class="text-gray-400">{{ $activity->created_at->diffForHumans(null, true) }}</span>
                             </li>
                             @endforeach
                         </ul>
