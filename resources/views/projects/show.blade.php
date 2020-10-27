@@ -55,6 +55,16 @@
                 </div>
                 <div class="w-full lg:w-1/3 md:w-2/4 px-4">
                     <livewire:card :project="$project"/>
+                    <div class="card mt-3">
+                        <ul class="text-sm space-y-1">
+                            @foreach ($project->activity as $activity)
+                            <li>
+                                @include('projects.activity.' . $activity->description)
+                                <span class="text-gray-400">{{ $activity->created_at->diffForHumans() }}</span>
+                            </li>
+                            @endforeach
+                        </ul>
+                    </div>
                 </div>
             </div>
         </div>

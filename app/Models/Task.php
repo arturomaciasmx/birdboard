@@ -22,6 +22,10 @@ class Task extends Model
         static::created(function ($task) {
             $task->project->recordActivity('task_created');
         });
+
+        static::deleted(function ($task) {
+            $task->project->recordActivity('task_deleted');
+        });
     }
 
 
