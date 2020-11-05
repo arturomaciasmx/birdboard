@@ -4,12 +4,15 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Arr;
 
 class Project extends Model
 {
     use HasFactory;
 
     protected $guarded = [];
+
+    public $old = [];
 
     public function path()
     {
@@ -21,12 +24,21 @@ class Project extends Model
         return $this->tasks()->create(['body' => $body, 'completed' => false]);
     }
 
-    public function recordActivity($type)
+    public function recordActivity($description)
     {
         $this->activity()->create([
-            'project_id' => $this->id,
-            'description' => $type
-        ]);
+            'description' => $description,
+            'changes' => $this->getActivityChanges($description)
+            ]);
+    }
+
+    public function getActivityChanges($description) {
+        if($description === 'updated') {
+            return [
+                'before' => Arr::except(array_diff($this->old, $this->getAttributes()),'updated_at'),
+                'after' => Arr::except(array_diff($this->getAttributes(), $this->old), 'updated_at')
+            ];
+        }
     }
 
     public function owner()

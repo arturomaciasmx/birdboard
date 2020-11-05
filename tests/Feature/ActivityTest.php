@@ -23,7 +23,11 @@ class ActivityTest extends TestCase
 
         $this->assertCount(1, $project->activity);
 
-        $this->assertEquals('created', $project->activity[0]->description);
+        tap($project->activity->last(), function($activity) {
+            $this->assertEquals('created', $activity->description);
+
+            $this->assertNull($activity->changes);
+        });
     }
 
 
@@ -31,15 +35,25 @@ class ActivityTest extends TestCase
     public function updating_a_project_creates_activity()
     {
 
-        $this->withoutExceptionHandling();
+        // $this->withoutExceptionHandling();
         $project = app(ProjectFactory::class)->create();
-
+        $originalTitle = $project->title;
         $this->actingAs($project->owner)
-            ->patch($project->path(), ['notes' => 'updated']);
+            ->patch($project->path(), ['title' => 'updated']);
 
         $this->assertCount(2, $project->activity);
 
-        $this->assertEquals('updated', $project->activity->last()->description);
+        tap($project->activity->last(), function($activity) use ($originalTitle) {
+            $this->assertEquals('updated', $activity->description);
+
+            $expected = [
+                'before' => ['title' => $originalTitle],
+                'after' => ['title' => 'updated']
+            ];
+
+            $this->assertEquals($expected, $activity->changes);
+        });
+
     }
 
     /** @test */
